@@ -4,13 +4,26 @@ import React, { useState , useEffect,useRef} from 'react'
 const Main = () => {
     const [message, setMessage] = useState([])
     const [input, setinput] = useState('')
-    const [botReply, setBotReply] = useState('')
+ 
     const chatContainerRef = useRef(null)
+    
+    
     useEffect(() => {
         if (chatContainerRef.current) {
           chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
+        localStorage.setItem("chat", JSON.stringify(message))
       }, [message]);
+   
+      useEffect(() => {
+        const savedChat = JSON.parse(localStorage.getItem("chat"));
+        if (savedChat && Array.isArray(savedChat)) {
+          setMessage(savedChat);
+        }
+      }, []);
+      
+      
+      
 
     const send = (e) => {
         e.preventDefault()
@@ -19,7 +32,8 @@ setMessage(prev =>[...prev, input])
 const msgtoreply = input
 setinput("")
 setTimeout(() => {
-    setBotReply(generateBotReply(msgtoreply))},2000)
+const reply=generateBotReply(msgtoreply)
+    setMessage(prev=>[...prev,reply])},2000)
 
     }
     
@@ -58,16 +72,18 @@ setTimeout(() => {
       {message.map((msg, index) => (
   <div
     key={index}
-    className="bg-blue-500 text-white px-4 py-2 rounded-lg max-w-[75%] self-end ml-auto"
+    
+    className={`${
+      index % 2 === 0 ? "bg-blue-500 text-white self-end ml-auto" : "bg-gray-200"
+    } px-4 py-2 rounded-lg max-w-[75%] 
+       
+     `}
+   
   >
     {msg}
   </div>
 ))}
-
-      { botReply &&  <div  className="bg-gray-200 px-4 py-2 rounded-lg max-w-[75%]">
-        {botReply}
-      </div>}
-      
+ 
      
     
     </div>
